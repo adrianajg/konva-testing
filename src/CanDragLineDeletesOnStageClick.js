@@ -10,7 +10,6 @@ function App() {
   const [cursor, setCursor] = useState(null);
   const [clicked, setClicked] = useState(false);
   const [touchingTarget, setTouchingTarget] = useState(false);
-  const [drawing, setDrawing] = useState(false);
 
   const setLineStartPoints = (e) => {
     console.log(e.target.attrs.x);
@@ -57,9 +56,6 @@ function App() {
             }
           }}
           onMouseUp={() => {
-            if (!clicked) {
-              return;
-            }
             if (!touchingTarget) {
               console.log("in first circle onMouseUp. removing point");
               setClicked(false);
