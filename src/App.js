@@ -10,11 +10,10 @@ function App() {
   const [cursor, setCursor] = useState(null);
   const [clicked, setClicked] = useState(false);
   const [touchingTarget, setTouchingTarget] = useState(false);
-  const [drawing, setDrawing] = useState(false);
+  // const [drawing, setDrawing] = useState(false);
 
-  const setLineStartPoints = (e) => {
-    console.log(e.target.attrs.x);
-    const firstPoints = [];
+  const handleClickFirstTarget = (e) => {
+    console.log("in handleClickFirstTarget");
     setPoints([
       e.target.attrs.x,
       e.target.attrs.y,
@@ -34,10 +33,13 @@ function App() {
     });
   };
 
+  const handleMouseMoveGeneral = (e) => {
+    const cursor = e.currentTarget.getPointerPosition();
+    setPoints((current) => [current[0], current[1], cursor.x, cursor.y]);
+  };
+
   const handleSetPoints = (x, y) => {
     console.log("in handleSetPoints");
-    // const objectX = e.target.attrs.x;
-    // const objectY = e.target.attrs.y;
     setPoints((current) => [current[0], current[1], x, y]);
   };
 
@@ -46,14 +48,13 @@ function App() {
       <header className="App-header"></header>
       <main>
         <Stage
-          // className="stage-container"
           id={"stage"}
           width={window.innerWidth}
           height={window.innerHeight}
-          // onMouseDown={handleMouseMove}
           onMouseMove={(e) => {
             if (clicked) {
-              handleMouseMove(e);
+              // console.log(e);
+              handleMouseMoveGeneral(e);
             }
           }}
           onMouseUp={() => {
@@ -61,7 +62,6 @@ function App() {
               return;
             }
             if (!touchingTarget) {
-              console.log("in first circle onMouseUp. removing point");
               setClicked(false);
               removeLastPoint();
             }
@@ -83,11 +83,14 @@ function App() {
                 e.target.fill("#72D6C9");
                 setTouchingTarget(false);
               }}
-              // onClick={setLineStartPoints}
-              // onMouseMove={handleMouseMove}
-              onMouseDown={() => {
-                console.log(clicked);
+              onMouseDown={(e) => {
+                handleClickFirstTarget(e);
                 setClicked(true);
+              }}
+              onMouseUp={(e) => {
+                console.log("in onMouseUp first circle");
+                handleSetPoints(e.target.attrs.x, e.target.attrs.y);
+                setClicked(false);
               }}
             ></Circle>
             <Circle
@@ -105,17 +108,14 @@ function App() {
                 e.target.fill("#72D6C9");
                 setTouchingTarget(false);
               }}
+              onMouseDown={(e) => {
+                handleClickFirstTarget(e);
+                setClicked(true);
+              }}
               onMouseUp={(e) => {
-                if (!touchingTarget) {
-                  removeLastPoint();
-                  return;
-                }
                 console.log("in onMouseUp second circle");
-                console.log(e);
                 handleSetPoints(e.target.attrs.x, e.target.attrs.y);
-                console.log(points);
                 setClicked(false);
-                console.log("clicked is", clicked);
               }}
             ></Circle>
             <Line id={"line"} strokeWidth={7} stroke="white" points={points} />
